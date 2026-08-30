@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#4f765b">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nährstoffe">
+<title>Nährstoff Woche</title>
+<style>
+:root{--bg:#f4f6f3;--card:#fff;--text:#1d261f;--muted:#6b746d;--line:#e1e6e1;--accent:#4f765b;--soft:#edf3ee;--low:#c28a3a;--danger:#a94e46}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;padding-bottom:env(safe-area-inset-bottom)}
+button,input,select{font:inherit}button{touch-action:manipulation}
+.app{max-width:1040px;margin:auto;padding:16px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+h1{font-size:25px;margin:0}.version{font-size:10px;color:var(--muted);vertical-align:middle}.top p{margin:5px 0;color:var(--muted);font-size:13px}
+.switch{display:flex;background:#e8ece8;border-radius:14px;padding:4px}.switch button{border:0;background:transparent;padding:11px 16px;border-radius:11px;font-weight:700;cursor:pointer;min-height:44px}.switch button.active{background:#fff;box-shadow:0 1px 5px #0002}
+.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}.card h2{font-size:17px;margin:0 0 12px}
+.summary{display:flex;justify-content:space-between;align-items:end;gap:10px}.big{font-size:34px;font-weight:800}.muted{color:var(--muted);font-size:12px}
+.section{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800;margin:4px 0 10px}
+.bar-row{margin:13px 0}.bar-head,.bar-sub{display:flex;justify-content:space-between;gap:10px}.bar-head{font-size:13px;margin-bottom:4px}.bar-sub{font-size:10px;color:var(--muted);margin-bottom:6px}.bar{height:12px;background:#edf0ed;border-radius:999px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,#7fa08a,#4f765b);border-radius:999px}.fill.low{background:linear-gradient(90deg,#d5ae75,#b98035)}
+.note{font-size:11px;line-height:1.5;color:var(--muted);margin-top:10px}
+.inputbox{display:grid;grid-template-columns:1fr 92px;gap:8px;margin-bottom:10px}.inputbox input,.inputbox select,.field input,.field select,.recipe-grid input,.recipe-grid select{border:1px solid var(--line);border-radius:11px;padding:10px;background:#fff;min-height:44px;width:100%}
+.actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:#fff;border-radius:11px;padding:10px 12px;font-weight:700;font-size:12px;cursor:pointer;min-height:42px}.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn.danger{color:var(--danger)}
+.foods{display:grid;grid-template-columns:1fr 1fr;gap:8px}.food{position:relative;border:1px solid var(--line);background:#fff;border-radius:13px;padding:12px;text-align:left;cursor:pointer;min-height:86px}.food:active{transform:scale(.985)}.food strong{display:block;font-size:13px;padding-right:26px}.food span{font-size:11px;color:var(--muted)}.food em{display:inline-block;margin-top:6px;font-size:10px;font-style:normal;background:var(--soft);padding:3px 6px;border-radius:999px}.fav{position:absolute;right:8px;top:7px;border:0;background:transparent;font-size:18px;cursor:pointer}
+.panel{display:none;background:#f8faf8;border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0}.panel.open{display:block}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.form-grid.three{grid-template-columns:1.4fr .65fr .85fr}.field label{display:block;font-size:10px;color:var(--muted);font-weight:700;margin:0 0 4px 2px}
+.nutrient-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.nutrient-field{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px}.nutrient-field label{display:block;font-size:10px;color:var(--muted);margin-bottom:4px}.nutrient-field input{width:100%;border:0;border-bottom:1px solid var(--line);padding:5px 2px;outline:none;background:transparent}
+.badges{display:flex;gap:6px;flex-wrap:wrap}.badge{font-size:11px;background:var(--soft);border-radius:999px;padding:6px 9px}
+.recipe-card,.supp-card{border:1px solid var(--line);border-radius:13px;padding:11px;margin-bottom:8px;background:#fff}.recipe-card-head,.supp-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.recipe-card strong,.supp-card strong{font-size:13px}.recipe-card small,.supp-card small{display:block;color:var(--muted);margin-top:4px;line-height:1.4}.recipe-actions{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.recipe-grid{display:grid;grid-template-columns:1fr 90px auto;gap:8px}.recipe-name{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px;min-height:44px;width:100%}.recipe-draft{margin:10px 0}.recipe-draft-item{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12px}
+.log{max-height:340px;overflow:auto}.log-item{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding:8px 0}.log-item strong{font-size:13px}.log-item span{font-size:11px;color:var(--muted)}.log-item button{border:0;border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:18px}
+.settings{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}.preset-settings{display:none;background:#f8faf8;border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px}.preset-settings.open{display:block}.preset-block{border-bottom:1px solid var(--line);padding:10px 0}.preset-block:last-child{border-bottom:0}.preset-block h3{font-size:13px;margin:0 0 8px}.mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.mini-grid.two{grid-template-columns:repeat(2,1fr)}.settings select{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1d261f;color:#fff;padding:10px 14px;border-radius:999px;font-size:12px;opacity:0;pointer-events:none;transition:.2s;z-index:20}.toast.show{opacity:1}
+@media(max-width:780px){.grid{grid-template-columns:1fr}.top{flex-direction:column;align-items:stretch}.switch button{flex:1}}
+@media(max-width:500px){.app{padding:12px}.mini-grid,.mini-grid.two{grid-template-columns:1fr}.foods{grid-template-columns:1fr}.inputbox{grid-template-columns:1fr 82px}.form-grid,.form-grid.three{grid-template-columns:1fr}.nutrient-grid{grid-template-columns:1fr 1fr}.recipe-grid{grid-template-columns:1fr 80px}.recipe-grid .btn{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div><h1>Nährstoff Woche <span class="version">v12</span></h1><p>Artur & Amelie · Wochenfortschritt, Rezepte & Supplements</p></div>
+    <div class="switch"><button id="pa">Artur</button><button id="pm">Amelie</button></div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="summary"><div><div class="section">Wochenfortschritt</div><div class="big" id="overall">0%</div></div><div class="muted" id="week"></div></div>
+      <div id="missingBox" class="note" style="background:#f8faf8;border:1px solid var(--line);padding:10px;border-radius:12px;margin:12px 0"></div>
+      <div id="bars"></div>
+      <div class="note">Die Balken laufen immer gegen das komplette Wochenziel von Montag bis Sonntag.</div>
+    </div>
+
+    <div class="card">
+      <h2 id="profileTitle"></h2>
+      <div class="settings"><span class="muted">Referenzprofil</span><select id="targetProfile"><option value="male">Erwachsener Mann</option><option value="female">Erwachsene Frau</option></select></div>
+      <div class="section" style="margin-top:14px">Feste Supplements</div>
+      <div class="badges"><span class="badge">Omega 3</span><span class="badge">Magnesium</span><span class="badge">Kreatin</span><span class="badge">Proteinpulver</span><span class="badge">Vitamin D + K2</span></div>
+      <div class="actions"><button class="btn" id="editPresetSupps">Supplement-Einstellungen bearbeiten</button></div>
+
+      <div class="preset-settings" id="presetSuppSettings">
+        <div class="preset-block">
+          <h3>Omega 3</h3>
+          <div class="mini-grid">
+            <div class="field"><label>EPA pro Kapsel (mg)</label><input id="setEPA" type="number" min="0" step="any"></div>
+            <div class="field"><label>DHA pro Kapsel (mg)</label><input id="setDHA" type="number" min="0" step="any"></div>
+            <div class="field"><label>Kapseln pro Standard-Eintrag</label><input id="setOmegaCaps" type="number" min="1" step="1"></div>
+          </div>
+        </div>
+
+        <div class="preset-block">
+          <h3>Magnesium</h3>
+          <div class="mini-grid two">
+            <div class="field"><label>Magnesium pro Kapsel (mg)</label><input id="setMgPerCap" type="number" min="0" step="any"></div>
+            <div class="field"><label>Standard-Kapseln</label><input id="setMgDefaultCaps" type="number" min="1" step="1"></div>
+          </div>
+        </div>
+
+        <div class="preset-block">
+          <h3>Kreatin</h3>
+          <div class="mini-grid two">
+            <div class="field"><label>Standardmenge (g)</label><input id="setCreatineG" type="number" min="0" step="any"></div>
+            <div class="field"><label>Tagesziel (g)</label><input id="setCreatineGoalG" type="number" min="0" step="any"></div>
+          </div>
+        </div>
+
+        <div class="preset-block">
+          <h3>Proteinpulver</h3>
+          <div class="mini-grid">
+            <div class="field"><label>Bio Protein 12K (%)</label><input id="setProt1" type="number" min="0" max="100" step="any"></div>
+            <div class="field"><label>Creamy Natural (%)</label><input id="setProt2" type="number" min="0" max="100" step="any"></div>
+            <div class="field"><label>Criollo Cacao (%)</label><input id="setProt3" type="number" min="0" max="100" step="any"></div>
+          </div>
+        </div>
+
+        <div class="preset-block">
+          <h3>Vitamin D3 + K2 MK7 Tropfen</h3><div class="note" style="margin:0 0 8px">Sunday Natural · 5.000 IE (125 µg) D3 + 200 µg K2 pro Tropfen · empfohlen: jeden 5. Tag 1 Tropfen</div>
+          <div class="mini-grid">
+            <div class="field"><label>Vitamin D pro Tropfen (µg)</label><input id="setVitD" type="number" min="0" step="any"></div>
+            <div class="field"><label>Vitamin K2 pro Tropfen (µg)</label><input id="setK2" type="number" min="0" step="any"></div>
+            <div class="field"><label>Tropfen pro Standard-Eintrag</label><input id="setDKPortions" type="number" min="1" step="1"></div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" id="savePresetSupps">Einstellungen speichern</button>
+          <button class="btn" id="cancelPresetSupps">Abbrechen</button>
+        </div>
+      </div>
+      <div class="note">Diese Einstellungen gelten gemeinsam für Artur und Amelie. Die Schnellbuttons und Wochenziele passen sich automatisch daran an.</div>
+    </div>
+
+    <div class="card">
+      <h2>Lebensmittel hinzufügen</h2>
+      <div class="inputbox"><input id="search" type="search" placeholder="Lebensmittel suchen …"><input id="grams" type="number" min="1" step="1" value="100" placeholder="g"></div>
+      <div class="actions" style="margin-top:0;margin-bottom:10px"><button class="btn" id="showAll">Alle</button><button class="btn" id="showFav">★ Favoriten</button><button class="btn" id="addCustom">+ Eigenes Lebensmittel</button></div>
+
+      <div class="panel" id="customFoodPanel">
+        <div class="section">Eigenes Lebensmittel anlegen</div>
+        <div class="form-grid">
+          <div class="field"><label>Name</label><input id="cfName" placeholder="z. B. Alpro Skyr Natur"></div>
+          <div class="field"><label>Bezugsmenge in g</label><input id="cfGrams" type="number" min="1" value="100"></div>
+        </div>
+        <div class="note">Trage nur Werte ein, die du kennst. Leere Felder zählen als 0. Alle Angaben beziehen sich auf die Bezugsmenge oben.</div>
+        <div class="nutrient-grid" id="customFoodNutrients"></div>
+        <div class="actions"><button class="btn primary" id="saveCustomFood">Speichern</button><button class="btn" id="cancelCustomFood">Abbrechen</button></div>
+      </div>
+
+      <div class="section" id="foodMode">Alle Lebensmittel</div>
+      <div class="foods" id="foods"></div>
+    </div>
+
+    <div class="card">
+      <h2>Supplements schnell eintragen</h2>
+      <div id="quickSupps"></div>
+
+      <div class="section" style="margin-top:14px">Proteinpulver</div>
+      <div class="inputbox">
+        <select id="proteinType">
+          <option value="bio12k">Bio Protein 12K Natural Vanilla</option>
+          <option value="creamyNatural">Creamy Protein Natural</option>
+          <option value="criolloCacao">Creamy Protein Natural Criollo Cacao</option>
+        </select>
+        <input id="proteinGrams" type="number" min="1" value="30">
+      </div>
+      <div class="actions"><button class="btn primary" id="addProtein">Proteinpulver eintragen</button></div>
+
+      <div class="section" style="margin-top:16px">Eigenes Supplement</div>
+      <div class="actions"><button class="btn" id="openCustomSupp">+ Eigenes Supplement anlegen</button></div>
+
+      <div class="panel" id="customSuppPanel">
+        <div class="form-grid three">
+          <div class="field"><label>Name</label><input id="csName" placeholder="z. B. Vitamin B12"></div>
+          <div class="field"><label>Portion</label><input id="csServing" type="number" min=".01" step=".01" value="1"></div>
+          <div class="field"><label>Einheit</label><select id="csUnit"><option>Kapsel</option><option>Tablette</option><option>g</option><option>ml</option><option>Tropfen</option><option>Portion</option></select></div>
+        </div>
+        <div class="note">Nährwerte pro Portion. Leere Felder werden einfach ignoriert.</div>
+        <div class="nutrient-grid" id="customSuppNutrients"></div>
+        <div class="form-grid" style="margin-top:8px">
+          <div class="field"><label>EPA in mg</label><input id="csEPA" type="number" min="0" step="any"></div>
+          <div class="field"><label>DHA in mg</label><input id="csDHA" type="number" min="0" step="any"></div>
+          <div class="field"><label>Kreatin in g</label><input id="csCreatine" type="number" min="0" step="any"></div>
+          <div class="field"><label>Protein in g</label><input id="csProtein" type="number" min="0" step="any"></div>
+        </div>
+        <div class="actions"><button class="btn primary" id="saveCustomSupp">Supplement speichern</button><button class="btn" id="cancelCustomSupp">Abbrechen</button></div>
+      </div>
+
+      <div id="customSuppList" style="margin-top:10px"></div>
+
+      <div class="section" style="margin-top:16px">Supplement Wochenfortschritt</div>
+      <div id="suppProgress"></div>
+      <div class="section" style="margin-top:16px">Diese Woche eingetragen</div>
+      <div class="log" id="suppLog"></div>
+    </div>
+
+    <div class="card">
+      <h2>Rezepte</h2>
+      <div class="section">Einmal anlegen, später mit einem Klick eintragen</div>
+      <div id="recipeList"></div>
+      <div class="actions"><button class="btn primary" id="newRecipe">+ Rezept erstellen</button></div>
+
+      <div class="panel" id="recipeBuilder">
+        <input class="recipe-name" id="recipeName" placeholder="Rezeptname, z. B. Tofu Bowl">
+        <div class="recipe-grid" style="margin-top:8px"><select id="recipeFood"></select><input id="recipeGrams" type="number" min="1" value="100"><button class="btn" id="addRecipeIngredient">Zutat hinzufügen</button></div>
+        <div class="recipe-draft" id="recipeDraft"></div>
+        <div class="actions"><button class="btn primary" id="saveRecipe">Rezept speichern</button><button class="btn" id="cancelRecipe">Abbrechen</button></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Diese Woche gegessen</h2>
+      <div class="log" id="log"></div>
+      <div class="actions"><button class="btn danger" id="resetWeek">Woche zurücksetzen</button></div>
+    </div>
+
+    <div class="card" style="grid-column:1/-1">
+      <h2>Was die Balken bedeuten</h2>
+      <div class="note">100 % bedeutet, dass das rechnerische Wochenziel erreicht wurde. Lebensmittelwerte sind Näherungswerte. Magnesium aus Supplements wird direkt im Magnesiumbalken berücksichtigt. Eigene Supplements können ebenfalls Nährstoffe in die Balken eintragen.</div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">Gespeichert</div>
+
+<script>
+const refs={
+  male:{A:[850,"µg RAE"],C:[110,"mg"],F:[300,"µg"],Ca:[1000,"mg"],Fe:[11,"mg"],Zn:[14,"mg"],I:[150,"µg"],Ch:[400,"mg"],Fi:[30,"g"],E:[8,"mg"],Mg:[350,"mg"]},
+  female:{A:[700,"µg RAE"],C:[95,"mg"],F:[300,"µg"],Ca:[1000,"mg"],Fe:[16,"mg"],Zn:[10,"mg"],I:[150,"µg"],Ch:[400,"mg"],Fi:[30,"g"],E:[8,"mg"],Mg:[300,"mg"]}
+};
+const nutrients=[
+  ["Vitamin A","A","Sehen · Haut · Immunsystem"],
+  ["Vitamin C","C","Immunsystem · Kollagen · Eisenaufnahme"],
+  ["Folat","F","Zellteilung · Blutbildung"],
+  ["Calcium","Ca","Knochen · Zähne · Muskeln · Nerven"],
+  ["Eisen","Fe","Sauerstofftransport · Energie"],
+  ["Zink","Zn","Immunsystem · Wundheilung · Haut"],
+  ["Jod","I","Schilddrüse · Stoffwechsel"],
+  ["Cholin","Ch","Leber · Nervensystem · Zellmembranen"],
+  ["Ballaststoffe","Fi","Verdauung · Darmflora · Sättigung"],
+  ["Vitamin E","E","Antioxidativer Zellschutz"],
+  ["Magnesium","Mg","Muskeln · Nerven · Energiestoffwechsel"]
+];
+
+const foods=[
+{name:"Banane",portion:"1 Stück (~120 g)",grams:120,tags:"C · Folat · Ballaststoffe",n:{A:4,C:10,F:24,Ca:6,Fe:.3,Zn:.2,I:0,Ch:12,Fi:3,E:.1,Mg:32}},
+{name:"Haferflocken",portion:"50 g",grams:50,tags:"Eisen · Zink · Ballaststoffe",n:{A:0,C:0,F:28,Ca:27,Fe:2.2,Zn:1.8,I:2,Ch:20,Fi:5,E:.3,Mg:70}},
+{name:"Alpro Skyr Natur",portion:"200 g",grams:200,tags:"Calcium · Protein",n:{A:0,C:0,F:0,Ca:240,Fe:0,Zn:0,I:0,Ch:0,Fi:2,E:0,Mg:24}},
+{name:"Brokkoli",portion:"200 g",grams:200,tags:"C · Folat · Calcium",n:{A:62,C:130,F:126,Ca:94,Fe:1.5,Zn:.8,I:4,Ch:80,Fi:6,E:1.5,Mg:42}},
+{name:"Spinat",portion:"150 g",grams:150,tags:"Folat · A · Eisen",n:{A:705,C:42,F:290,Ca:150,Fe:4.1,Zn:.8,I:5,Ch:30,Fi:3.3,E:3,Mg:119}},
+{name:"Karotte",portion:"2 Stück (~160 g)",grams:160,tags:"Vitamin A · Ballaststoffe",n:{A:1060,C:9,F:30,Ca:53,Fe:.5,Zn:.4,I:2,Ch:14,Fi:4.5,E:1.1,Mg:19}},
+{name:"Paprika rot",portion:"1 Stück (~150 g)",grams:150,tags:"Vitamin C · A",n:{A:235,C:190,F:70,Ca:11,Fe:.7,Zn:.4,I:0,Ch:8,Fi:3.2,E:2.4,Mg:18}},
+{name:"Kiwi",portion:"1 Stück (~80 g)",grams:80,tags:"Vitamin C · Folat",n:{A:3,C:60,F:20,Ca:27,Fe:.2,Zn:.1,I:0,Ch:6,Fi:2.4,E:1.2,Mg:14}},
+{name:"Beeren",portion:"150 g",grams:150,tags:"C · Ballaststoffe",n:{A:10,C:30,F:35,Ca:35,Fe:.8,Zn:.4,I:0,Ch:18,Fi:6,E:1,Mg:24}},
+{name:"Kichererbsen",portion:"150 g gekocht",grams:150,tags:"Folat · Eisen · Zink",n:{A:2,C:2,F:258,Ca:74,Fe:4.3,Zn:2.3,I:2,Ch:65,Fi:11,E:.6,Mg:72}},
+{name:"Linsen",portion:"150 g gekocht",grams:150,tags:"Folat · Eisen · Ballaststoffe",n:{A:2,C:2,F:270,Ca:29,Fe:5,Zn:1.9,I:2,Ch:49,Fi:12,E:.2,Mg:54}},
+{name:"Tofu",portion:"200 g",grams:200,tags:"Calcium · Eisen · Zink",n:{A:0,C:0,F:54,Ca:300,Fe:5.4,Zn:2.4,I:2,Ch:65,Fi:2,E:.4,Mg:60}},
+{name:"Hähnchen",portion:"180 g gegart",grams:180,tags:"Zink · Cholin",n:{A:20,C:0,F:10,Ca:27,Fe:1.8,Zn:2.7,I:8,Ch:150,Fi:0,E:.6,Mg:50}},
+{name:"Eier",portion:"2 Stück",grams:120,tags:"Cholin · Jod · Eisen",n:{A:160,C:0,F:48,Ca:56,Fe:1.8,Zn:1.3,I:48,Ch:294,Fi:0,E:1.1,Mg:14}},
+{name:"Mandeln",portion:"30 g",grams:30,tags:"Vitamin E · Calcium",n:{A:0,C:0,F:13,Ca:80,Fe:1.1,Zn:.9,I:1,Ch:16,Fi:3.8,E:7.7,Mg:81}},
+{name:"Kürbiskerne",portion:"30 g",grams:30,tags:"Zink · Eisen",n:{A:0,C:.5,F:17,Ca:14,Fe:2.7,Zn:2.3,I:1,Ch:19,Fi:1.8,E:.7,Mg:160}},
+{name:"Quinoa",portion:"150 g gekocht",grams:150,tags:"Folat · Eisen · Zink",n:{A:2,C:0,F:63,Ca:26,Fe:2.2,Zn:1.6,I:0,Ch:35,Fi:4.2,E:.9,Mg:96}},
+{name:"Kartoffeln",portion:"300 g gekocht",grams:300,tags:"C · Folat · Ballaststoffe",n:{A:0,C:36,F:45,Ca:18,Fe:.9,Zn:.9,I:6,Ch:36,Fi:5.4,E:.1,Mg:69}},
+{name:"Jodsalz",portion:"2 g",grams:2,tags:"Jod",n:{A:0,C:0,F:0,Ca:0,Fe:0,Zn:0,I:40,Ch:0,Fi:0,E:0,Mg:0}},
+{name:"Calciumreiches Wasser",portion:"1 Liter (300 mg Ca/L)",grams:1000,tags:"Calcium",n:{A:0,C:0,F:0,Ca:300,Fe:0,Zn:0,I:0,Ch:0,Fi:0,E:0,Mg:0}}
+];
+
+const defaults={
+  Artur:{target:"male",favorites:[],custom:[],recipes:[],customSupplements:[],suppLog:[],log:[]},
+  Amelie:{target:"female",favorites:[],custom:[],recipes:[],customSupplements:[],suppLog:[],log:[]}
+};
+const defaultSupplementSettings={
+  omega3:{epaMg:400,dhaMg:225,capsulesPerEntry:1},
+  magnesium:{mgPerCapsule:100,defaultCapsules:2},
+  creatine:{gramsPerEntry:5,dailyGoalG:5},
+  protein:{
+    bio12kPct:75,
+    creamyNaturalPct:84,
+    criolloCacaoPct:78
+  },
+  dk:{vitaminDug:125,k2ug:200,portionsPerEntry:1}
+};
+
+function loadSupplementSettings(){
+  let s=null;
+  try{s=JSON.parse(localStorage.getItem("nt-supp-settings-v11")||"null")}catch(e){}
+  if(!s)s=structuredClone(defaultSupplementSettings);
+  s.omega3={...defaultSupplementSettings.omega3,...(s.omega3||{})};
+  s.magnesium={...defaultSupplementSettings.magnesium,...(s.magnesium||{})};
+  s.creatine={...defaultSupplementSettings.creatine,...(s.creatine||{})};
+  s.protein={...defaultSupplementSettings.protein,...(s.protein||{})};
+  s.dk={...defaultSupplementSettings.dk,...(s.dk||{})};
+  return s;
+}
+let suppSettings=loadSupplementSettings();
+
+
+function loadState(){
+  let s=null;
+  for(const key of ["nt-state-v11","nt-state-v10","nt-state-v9","nt-state-v8"]){
+    try{s=JSON.parse(localStorage.getItem(key)||"null")}catch(e){}
+    if(s)break;
+  }
+  if(!s)s=structuredClone(defaults);
+  ["Artur","Amelie"].forEach(p=>{
+    if(!s[p])s[p]=structuredClone(defaults[p]);
+    s[p].favorites=s[p].favorites||[];
+    s[p].custom=s[p].custom||[];
+    s[p].recipes=s[p].recipes||[];
+    s[p].customSupplements=s[p].customSupplements||[];
+    s[p].suppLog=s[p].suppLog||[];
+    s[p].log=s[p].log||[];
+  });
+  return s;
+}
+let state=loadState();
+let profile=localStorage.getItem("nt-profile-v11")||localStorage.getItem("nt-profile-v10")||localStorage.getItem("nt-profile-v9")||localStorage.getItem("nt-profile-v8")||"Artur";
+let filterMode="all";
+let recipeDraft=[];
+
+function save(){localStorage.setItem("nt-state-v11",JSON.stringify(state));localStorage.setItem("nt-profile-v11",profile)}
+function saveSuppSettings(){localStorage.setItem("nt-supp-settings-v11",JSON.stringify(suppSettings))}
+function toast(msg){let t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),900)}
+function today(){let d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
+function currentWeekDates(){let d=new Date(),m=new Date(d);m.setDate(d.getDate()-((d.getDay()+6)%7));let a=[];for(let i=0;i<7;i++){let x=new Date(m);x.setDate(m.getDate()+i);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());a.push(x.toISOString().slice(0,10))}return a}
+function weekText(){let a=currentWeekDates();let s=new Date(a[0]+"T12:00:00"),e=new Date(a[6]+"T12:00:00");return s.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})+" – "+e.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})}
+function addN(total,n,scale=1){Object.entries(n||{}).forEach(([k,v])=>total[k]=(total[k]||0)+(Number(v)||0)*scale)}
+function fmt(v,unit){let digits=(v<10&&unit==="mg")?1:0;return Number(v).toLocaleString("de-DE",{maximumFractionDigits:digits})+" "+unit}
+
+function calc(){
+  let t={};nutrients.forEach(x=>t[x[1]]=0);let wk=currentWeekDates();
+  state[profile].log.filter(e=>wk.includes(e.date)).forEach(e=>{
+    let f=e.customFood||foods[e.i];if(f)addN(t,f.n,e.scale||1);
+  });
+  state[profile].suppLog.filter(e=>wk.includes(e.date)).forEach(e=>{
+    if(e.type==="magnesium")t.Mg+=(e.magnesiumMg||0);
+    if(e.type==="custom")addN(t,e.nutrients||{},1);
+  });
+  return t;
+}
+
+function renderProgress(){
+  let total=calc(),r=refs[state[profile].target],sum=0,missing=[],box=document.getElementById("bars");box.innerHTML="";
+  nutrients.forEach(([label,key,purpose])=>{
+    let goal=r[key][0]*7,unit=r[key][1],val=total[key]||0,pct=Math.round(val/goal*100),rest=Math.max(0,goal-val);
+    sum+=Math.min(pct,100);if(rest>0)missing.push({label,pct});
+    box.insertAdjacentHTML("beforeend",`<div class="bar-row">
+      <div class="bar-head"><div><b>${label}</b><div style="font-size:10px;color:var(--muted);margin-top:2px">(${purpose})</div></div><span>${pct}%</span></div>
+      <div class="bar-sub"><span>${fmt(val,unit)} diese Woche</span><span>${rest>0?fmt(rest,unit)+" fehlen":"Wochenziel erreicht"}</span></div>
+      <div class="bar"><div class="fill ${pct<50?"low":""}" style="width:${Math.min(pct,100)}%"></div></div>
+    </div>`);
+  });
+  document.getElementById("overall").textContent=Math.round(sum/nutrients.length)+"%";
+  missing.sort((a,b)=>a.pct-b.pct);
+  document.getElementById("missingBox").innerHTML=missing.length
+    ? "<b>Diese Woche noch besonders offen:</b><br>"+missing.slice(0,3).map(x=>x.label+" "+Math.max(0,100-x.pct)+" % offen").join(" · ")
+    : "<b>Alle dargestellten Wochenziele erreicht.</b>";
+}
+
+function allFoods(){
+  return foods.map((f,i)=>({...f,baseIndex:i,isCustom:false}))
+    .concat(state[profile].custom.map((f,i)=>({...f,customIndex:i,isCustom:true})));
+}
+function foodKey(f){return f.isCustom?"c:"+f.customIndex:"b:"+f.baseIndex}
+function isFav(f){return state[profile].favorites.includes(foodKey(f))}
+function toggleFav(f){let k=foodKey(f);state[profile].favorites=isFav(f)?state[profile].favorites.filter(x=>x!==k):state[profile].favorites.concat(k);save();renderFoods()}
+function renderFoods(){
+  let q=(document.getElementById("search").value||"").trim().toLowerCase();
+  let list=allFoods().filter(f=>!q||f.name.toLowerCase().includes(q));
+  if(filterMode==="fav")list=list.filter(isFav);
+  let box=document.getElementById("foods");box.innerHTML="";
+  if(!list.length){box.innerHTML='<div class="muted">Keine Treffer.</div>';return}
+  list.forEach(f=>{
+    let b=document.createElement("button");b.className="food";b.type="button";
+    b.innerHTML=`<button class="fav" type="button">${isFav(f)?"★":"☆"}</button><strong>${f.name}</strong><span>${f.portion}</span><br><em>${f.tags||"Eigenes Lebensmittel"}</em>`;
+    b.querySelector(".fav").onclick=e=>{e.stopPropagation();toggleFav(f)};
+    b.onclick=()=>addFoodEntry(f);
+    box.appendChild(b);
+  });
+}
+function addFoodEntry(f){
+  let g=parseFloat(document.getElementById("grams").value);if(!g||g<=0)g=f.grams||100;
+  let e={date:today(),scale:g/(f.grams||100),amountLabel:Math.round(g)+" g"};
+  if(f.isCustom)e.customFood={name:f.name,portion:f.portion,grams:f.grams,n:f.n,tags:f.tags};else e.i=f.baseIndex;
+  state[profile].log.push(e);save();render();toast(f.name+" gespeichert");
+}
+
+function buildNutrientInputs(container,prefix){
+  let box=document.getElementById(container);box.innerHTML="";
+  nutrients.forEach(([label,key])=>{
+    let unit=refs[state[profile].target][key][1];
+    let d=document.createElement("div");d.className="nutrient-field";
+    d.innerHTML=`<label>${label} (${unit})</label><input id="${prefix}${key}" type="number" min="0" step="any" placeholder="0">`;
+    box.appendChild(d);
+  });
+}
+function openCustomFood(){
+  buildNutrientInputs("customFoodNutrients","cf_");
+  document.getElementById("cfName").value="";
+  document.getElementById("cfGrams").value="100";
+  document.getElementById("customFoodPanel").classList.add("open");
+}
+function closeCustomFood(){document.getElementById("customFoodPanel").classList.remove("open")}
+function saveCustomFood(){
+  let name=document.getElementById("cfName").value.trim(),grams=parseFloat(document.getElementById("cfGrams").value);
+  if(!name)return toast("Bitte Namen eingeben");
+  if(!grams||grams<=0)return toast("Bitte Bezugsmenge eingeben");
+  let n={};nutrients.forEach(([l,k])=>{let el=document.getElementById("cf_"+k);n[k]=el.value===""?0:(parseFloat(el.value)||0)});
+  state[profile].custom.push({name,portion:grams+" g",grams,n,tags:"Eigenes Lebensmittel"});
+  save();closeCustomFood();renderFoods();populateRecipeFoods();toast(name+" gespeichert");
+}
+
+function renderQuickSupps(){
+  const o=suppSettings.omega3,m=suppSettings.magnesium,c=suppSettings.creatine,dk=suppSettings.dk;
+  let dkCard="";
+  if((dk.vitaminDug||0)>0 || (dk.k2ug||0)>0){
+    dkCard=`<div class="supp-card"><div class="supp-head"><strong>Vitamin D3 + K2 MK7 Tropfen</strong><span class="badge">${dk.portionsPerEntry} Tropfen</span></div><small>${dk.vitaminDug||0} µg Vitamin D3 + ${dk.k2ug||0} µg K2 pro Tropfen · Einnahme: 1 Tropfen jeden 5. Tag</small><div class="actions"><button class="btn primary" id="qDK">+ Tropfen eintragen</button></div></div>`;
+  }else{
+    dkCard=`<div class="supp-card"><div class="supp-head"><strong>Vitamin D3 + K2 MK7 Tropfen</strong><span class="badge">noch offen</span></div><small>Dosierung noch nicht hinterlegt. Unter Supplement-Einstellungen kannst du sie ergänzen.</small></div>`;
+  }
+
+  document.getElementById("quickSupps").innerHTML=`
+  <div class="supp-card"><div class="supp-head"><strong>Omega 3</strong><span class="badge">${o.capsulesPerEntry} Kapsel${o.capsulesPerEntry===1?"":"n"}</span></div><small>${o.epaMg} mg EPA + ${o.dhaMg} mg DHA pro Kapsel</small><div class="actions"><button class="btn primary" id="qOmega">+ Standard-Eintrag</button></div></div>
+  <div class="supp-card"><div class="supp-head"><strong>Magnesium</strong><span class="badge">${m.mgPerCapsule} mg/Kapsel</span></div><small>Standard: ${m.defaultCapsules} Kapsel${m.defaultCapsules===1?"":"n"} = ${m.mgPerCapsule*m.defaultCapsules} mg Magnesium</small><div class="actions"><button class="btn" id="qMg1">+ 1 Kapsel</button><button class="btn primary" id="qMgDefault">+ Standard</button></div></div>
+  <div class="supp-card"><div class="supp-head"><strong>Kreatin</strong><span class="badge">${c.gramsPerEntry} g</span></div><small>Standard-Eintrag: ${c.gramsPerEntry} g Kreatin</small><div class="actions"><button class="btn primary" id="qCreatine">+ Standard-Eintrag</button></div></div>
+  ${dkCard}`;
+  document.getElementById("qOmega").onclick=()=>addQuickSupplement("omega3",o.capsulesPerEntry);
+  document.getElementById("qMg1").onclick=()=>addQuickSupplement("magnesium",1);
+  document.getElementById("qMgDefault").onclick=()=>addQuickSupplement("magnesium",m.defaultCapsules);
+  document.getElementById("qCreatine").onclick=()=>addQuickSupplement("creatine",c.gramsPerEntry);
+  if(document.getElementById("qDK"))document.getElementById("qDK").onclick=()=>addQuickSupplement("dk",dk.portionsPerEntry);
+}
+function addQuickSupplement(type,amount){
+  let e={date:today(),type};
+  if(type==="omega3"){
+    let o=suppSettings.omega3;
+    e.capsules=amount;
+    e.epaMg=o.epaMg*amount;
+    e.dhaMg=o.dhaMg*amount;
+    e.label="Omega 3 · "+amount+" Kapsel"+(amount===1?"":"n");
+  }
+  if(type==="magnesium"){
+    let m=suppSettings.magnesium;
+    e.capsules=amount;
+    e.magnesiumMg=m.mgPerCapsule*amount;
+    e.label="Magnesium · "+amount+" Kapsel"+(amount===1?"":"n");
+  }
+  if(type==="creatine"){
+    e.creatineG=amount;
+    e.label="Kreatin · "+amount+" g";
+  }
+  if(type==="dk"){
+    let dk=suppSettings.dk;
+    e.portions=amount;
+    e.vitaminDug=dk.vitaminDug*amount;
+    e.k2ug=dk.k2ug*amount;
+    e.label="Vitamin D3 + K2 · "+amount+" Tropfen";
+  }
+  state[profile].suppLog.push(e);save();render();toast(e.label+" gespeichert");
+}
+function addProtein(){
+  let g=parseFloat(document.getElementById("proteinGrams").value);if(!g||g<=0)return;
+  let s=document.getElementById("proteinType"),key=s.value,name=s.options[s.selectedIndex].text;
+  let pct=suppSettings.protein[key==="bio12k"?"bio12kPct":key==="creamyNatural"?"creamyNaturalPct":"criolloCacaoPct"];
+  let fraction=(pct||0)/100;
+  state[profile].suppLog.push({date:today(),type:"protein",grams:g,proteinG:g*fraction,label:name+" · "+Math.round(g)+" g"});
+  save();render();toast(name+" gespeichert");
+}
+
+function openCustomSupp(){
+  buildNutrientInputs("customSuppNutrients","cs_");
+  ["csEPA","csDHA","csCreatine","csProtein"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("csName").value="";
+  document.getElementById("csServing").value="1";
+  document.getElementById("customSuppPanel").classList.add("open");
+}
+function closeCustomSupp(){document.getElementById("customSuppPanel").classList.remove("open")}
+function saveCustomSupp(){
+  let name=document.getElementById("csName").value.trim(),serving=parseFloat(document.getElementById("csServing").value),unit=document.getElementById("csUnit").value;
+  if(!name)return toast("Bitte Namen eingeben");
+  if(!serving||serving<=0)return toast("Bitte Portion eingeben");
+  let n={};nutrients.forEach(([l,k])=>{let el=document.getElementById("cs_"+k);n[k]=el.value===""?0:(parseFloat(el.value)||0)});
+  state[profile].customSupplements.push({
+    id:"cs"+Date.now()+Math.random().toString(36).slice(2,6),name,serving,unit,nutrients:n,
+    epaMg:parseFloat(document.getElementById("csEPA").value)||0,
+    dhaMg:parseFloat(document.getElementById("csDHA").value)||0,
+    creatineG:parseFloat(document.getElementById("csCreatine").value)||0,
+    proteinG:parseFloat(document.getElementById("csProtein").value)||0
+  });
+  save();closeCustomSupp();render();toast(name+" gespeichert");
+}
+function renderCustomSupps(){
+  let box=document.getElementById("customSuppList");box.innerHTML="";
+  if(!state[profile].customSupplements.length){box.innerHTML='<div class="muted">Noch keine eigenen Supplements angelegt.</div>';return}
+  state[profile].customSupplements.forEach((s,idx)=>{
+    let parts=[];nutrients.forEach(([l,k])=>{if(s.nutrients[k])parts.push(l+" "+fmt(s.nutrients[k],refs[state[profile].target][k][1]))});
+    if(s.epaMg)parts.push(s.epaMg+" mg EPA");if(s.dhaMg)parts.push(s.dhaMg+" mg DHA");if(s.creatineG)parts.push(s.creatineG+" g Kreatin");if(s.proteinG)parts.push(s.proteinG+" g Protein");
+    let d=document.createElement("div");d.className="supp-card";
+    d.innerHTML=`<div class="supp-head"><strong>${s.name}</strong><span class="badge">${s.serving} ${s.unit}</span></div><small>${parts.length?parts.join(" · "):"Keine Nährwerte hinterlegt"}</small><div class="actions"><button class="btn primary add">1 Portion eintragen</button><button class="btn danger del">Löschen</button></div>`;
+    d.querySelector(".add").onclick=()=>addCustomSuppEntry(s);
+    d.querySelector(".del").onclick=()=>{state[profile].customSupplements.splice(idx,1);save();render();toast("Supplement gelöscht")};
+    box.appendChild(d);
+  });
+}
+function addCustomSuppEntry(s){
+  state[profile].suppLog.push({date:today(),type:"custom",label:s.name+" · "+s.serving+" "+s.unit,nutrients:structuredClone(s.nutrients||{}),epaMg:s.epaMg||0,dhaMg:s.dhaMg||0,creatineG:s.creatineG||0,proteinG:s.proteinG||0});
+  save();render();toast(s.name+" eingetragen");
+}
+
+function renderSuppProgress(){
+  let wk=currentWeekDates(),entries=state[profile].suppLog.filter(e=>wk.includes(e.date));
+  let omega=0,creatine=0,protein=0,omegaCaps=0;
+  entries.forEach(e=>{
+    if(e.type==="omega3"){omega+=(e.epaMg||0)+(e.dhaMg||0);omegaCaps+=(e.capsules||0)}
+    if(e.type==="creatine")creatine+=(e.creatineG||0);
+    if(e.type==="protein")protein+=(e.proteinG||0);
+    if(e.type==="custom"){omega+=(e.epaMg||0)+(e.dhaMg||0);creatine+=(e.creatineG||0);protein+=(e.proteinG||0)}
+  });
+  function progress(label,val,goal,unit,purpose){
+    let pct=Math.round(val/goal*100),rest=Math.max(0,goal-val);
+    return `<div class="bar-row"><div class="bar-head"><div><b>${label}</b><div style="font-size:10px;color:var(--muted);margin-top:2px">(${purpose})</div></div><span>${pct}%</span></div><div class="bar-sub"><span>${fmt(val,unit)} diese Woche</span><span>${rest>0?fmt(rest,unit)+" fehlen":"Wochenziel erreicht"}</span></div><div class="bar"><div class="fill ${pct<50?"low":""}" style="width:${Math.min(pct,100)}%"></div></div></div>`;
+  }
+  document.getElementById("suppProgress").innerHTML=
+    progress("Omega 3 (EPA + DHA)",omega,(suppSettings.omega3.epaMg+suppSettings.omega3.dhaMg)*suppSettings.omega3.capsulesPerEntry*7,"mg","nach deinem eingestellten Tagesplan · Herz · Gehirn")+
+    progress("Kreatin",creatine,suppSettings.creatine.dailyGoalG*7,"g","nach deinem eingestellten Tagesziel · Schnellkraft · Leistung")+
+    `<div class="bar-row"><div class="bar-head"><div><b>Protein aus Pulver</b><div style="font-size:10px;color:var(--muted);margin-top:2px">(Muskelaufbau · Muskelerhalt)</div></div><span>${protein.toLocaleString("de-DE",{maximumFractionDigits:1})} g</span></div><div class="bar-sub"><span>aus eingetragenem Proteinpulver</span><span>kein eigenes Wochenziel</span></div></div>`;
+}
+function renderSuppLog(){
+  let wk=currentWeekDates(),entries=state[profile].suppLog.map((e,i)=>({...e,real:i})).filter(e=>wk.includes(e.date)),box=document.getElementById("suppLog");box.innerHTML="";
+  if(!entries.length){box.innerHTML='<div class="muted">Diese Woche noch keine Supplements eingetragen.</div>';return}
+  [...entries].reverse().forEach(e=>{
+    let detail=[];
+    if(e.magnesiumMg)detail.push(e.magnesiumMg+" mg Magnesium");
+    if(e.epaMg)detail.push(e.epaMg+" mg EPA");
+    if(e.dhaMg)detail.push(e.dhaMg+" mg DHA");
+    if(e.creatineG)detail.push(e.creatineG+" g Kreatin");
+    if(e.proteinG)detail.push(e.proteinG.toLocaleString("de-DE",{maximumFractionDigits:1})+" g Protein");if(e.vitaminDug)detail.push(e.vitaminDug+" µg Vitamin D");if(e.k2ug)detail.push(e.k2ug+" µg K2");
+    if(e.type==="custom"&&e.nutrients)nutrients.forEach(([l,k])=>{if(e.nutrients[k])detail.push(l+" "+fmt(e.nutrients[k],refs[state[profile].target][k][1]))});
+    let ds=new Date(e.date+"T12:00:00").toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit"});
+    let row=document.createElement("div");row.className="log-item";row.innerHTML=`<div><strong>${e.label}</strong><br><span>${detail.join(" · ")} · ${ds}</span></div><button>×</button>`;
+    row.querySelector("button").onclick=()=>{state[profile].suppLog.splice(e.real,1);save();render()};
+    box.appendChild(row);
+  });
+}
+
+function foodRef(f){return f.isCustom?{type:"custom",food:{name:f.name,portion:f.portion,grams:f.grams,n:f.n,tags:f.tags}}:{type:"base",i:f.baseIndex}}
+function resolveIng(ing){return ing.type==="custom"?ing.food:foods[ing.i]}
+function populateRecipeFoods(){let s=document.getElementById("recipeFood");s.innerHTML="";allFoods().forEach((f,i)=>{let o=document.createElement("option");o.value=i;o.textContent=f.name;s.appendChild(o)})}
+function renderRecipeDraft(){
+  let box=document.getElementById("recipeDraft");box.innerHTML="";
+  if(!recipeDraft.length){box.innerHTML='<div class="muted">Noch keine Zutaten.</div>';return}
+  recipeDraft.forEach((ing,i)=>{let f=resolveIng(ing),r=document.createElement("div");r.className="recipe-draft-item";r.innerHTML=`<span><b>${f.name}</b> · ${Math.round(ing.grams)} g</span><button class="btn">×</button>`;r.querySelector("button").onclick=()=>{recipeDraft.splice(i,1);renderRecipeDraft()};box.appendChild(r)})
+}
+function renderRecipes(){
+  let box=document.getElementById("recipeList");box.innerHTML="";
+  if(!state[profile].recipes.length){box.innerHTML='<div class="muted">Noch keine Rezepte gespeichert.</div>';return}
+  state[profile].recipes.forEach((r,i)=>{let d=document.createElement("div");d.className="recipe-card";d.innerHTML=`<div class="recipe-card-head"><strong>${r.name}</strong><span class="badge">${r.ingredients.length} Zutaten</span></div><small>${r.ingredients.map(x=>resolveIng(x).name+" "+Math.round(x.grams)+" g").join(" · ")}</small><div class="recipe-actions"><button class="btn primary add">1 Portion eintragen</button><button class="btn danger del">Löschen</button></div>`;d.querySelector(".add").onclick=()=>addRecipe(r);d.querySelector(".del").onclick=()=>{state[profile].recipes.splice(i,1);save();renderRecipes()};box.appendChild(d)})
+}
+function addRecipe(r){
+  r.ingredients.forEach(ing=>{let f=resolveIng(ing),e={date:today(),scale:ing.grams/(f.grams||100),amountLabel:Math.round(ing.grams)+" g",recipe:r.name};if(ing.type==="custom")e.customFood=ing.food;else e.i=ing.i;state[profile].log.push(e)});
+  save();render();toast(r.name+" eingetragen");
+}
+function renderFoodLog(){
+  let wk=currentWeekDates(),entries=state[profile].log.map((e,i)=>({...e,real:i})).filter(e=>wk.includes(e.date)),box=document.getElementById("log");box.innerHTML="";
+  if(!entries.length){box.innerHTML='<div class="muted">Diese Woche noch nichts eingetragen.</div>';return}
+  [...entries].reverse().forEach(e=>{let f=e.customFood||foods[e.i],ds=new Date(e.date+"T12:00:00").toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit"}),row=document.createElement("div");row.className="log-item";row.innerHTML=`<div><strong>${f.name}</strong><br><span>${e.amountLabel||f.portion} · ${ds}${e.recipe?" · "+e.recipe:""}</span></div><button>×</button>`;row.querySelector("button").onclick=()=>{state[profile].log.splice(e.real,1);save();render()};box.appendChild(row)})
+}
+
+
+function openPresetSuppSettings(){
+  const o=suppSettings.omega3,m=suppSettings.magnesium,c=suppSettings.creatine,p=suppSettings.protein,dk=suppSettings.dk;
+  document.getElementById("setEPA").value=o.epaMg;
+  document.getElementById("setDHA").value=o.dhaMg;
+  document.getElementById("setOmegaCaps").value=o.capsulesPerEntry;
+  document.getElementById("setMgPerCap").value=m.mgPerCapsule;
+  document.getElementById("setMgDefaultCaps").value=m.defaultCapsules;
+  document.getElementById("setCreatineG").value=c.gramsPerEntry;
+  document.getElementById("setCreatineGoalG").value=c.dailyGoalG;
+  document.getElementById("setProt1").value=p.bio12kPct;
+  document.getElementById("setProt2").value=p.creamyNaturalPct;
+  document.getElementById("setProt3").value=p.criolloCacaoPct;
+  document.getElementById("setVitD").value=dk.vitaminDug||"";
+  document.getElementById("setK2").value=dk.k2ug||"";
+  document.getElementById("setDKPortions").value=dk.portionsPerEntry;
+  document.getElementById("presetSuppSettings").classList.add("open");
+}
+function closePresetSuppSettings(){document.getElementById("presetSuppSettings").classList.remove("open")}
+function savePresetSuppSettings(){
+  suppSettings.omega3.epaMg=parseFloat(document.getElementById("setEPA").value)||0;
+  suppSettings.omega3.dhaMg=parseFloat(document.getElementById("setDHA").value)||0;
+  suppSettings.omega3.capsulesPerEntry=Math.max(1,parseInt(document.getElementById("setOmegaCaps").value)||1);
+  suppSettings.magnesium.mgPerCapsule=parseFloat(document.getElementById("setMgPerCap").value)||0;
+  suppSettings.magnesium.defaultCapsules=Math.max(1,parseInt(document.getElementById("setMgDefaultCaps").value)||1);
+  suppSettings.creatine.gramsPerEntry=parseFloat(document.getElementById("setCreatineG").value)||0;
+  suppSettings.creatine.dailyGoalG=parseFloat(document.getElementById("setCreatineGoalG").value)||0;
+  suppSettings.protein.bio12kPct=Math.max(0,parseFloat(document.getElementById("setProt1").value)||0);
+  suppSettings.protein.creamyNaturalPct=Math.max(0,parseFloat(document.getElementById("setProt2").value)||0);
+  suppSettings.protein.criolloCacaoPct=Math.max(0,parseFloat(document.getElementById("setProt3").value)||0);
+  suppSettings.dk.vitaminDug=parseFloat(document.getElementById("setVitD").value)||0;
+  suppSettings.dk.k2ug=parseFloat(document.getElementById("setK2").value)||0;
+  suppSettings.dk.portionsPerEntry=Math.max(1,parseInt(document.getElementById("setDKPortions").value)||1);
+  saveSuppSettings();
+  closePresetSuppSettings();
+  render();
+  toast("Supplement-Einstellungen gespeichert");
+}
+
+function render(){
+  document.getElementById("pa").classList.toggle("active",profile==="Artur");
+  document.getElementById("pm").classList.toggle("active",profile==="Amelie");
+  document.getElementById("profileTitle").textContent=profile;
+  document.getElementById("targetProfile").value=state[profile].target;
+  document.getElementById("week").textContent=weekText();
+  renderProgress();renderFoods();renderQuickSupps();renderCustomSupps();renderSuppProgress();renderSuppLog();populateRecipeFoods();renderRecipes();renderFoodLog();
+}
+
+document.getElementById("pa").onclick=()=>{profile="Artur";save();render()};
+document.getElementById("pm").onclick=()=>{profile="Amelie";save();render()};
+document.getElementById("targetProfile").onchange=e=>{state[profile].target=e.target.value;save();render()};
+document.getElementById("editPresetSupps").onclick=openPresetSuppSettings;
+document.getElementById("savePresetSupps").onclick=savePresetSuppSettings;
+document.getElementById("cancelPresetSupps").onclick=closePresetSuppSettings;
+document.getElementById("search").oninput=renderFoods;
+document.getElementById("showAll").onclick=()=>{filterMode="all";document.getElementById("foodMode").textContent="Alle Lebensmittel";renderFoods()};
+document.getElementById("showFav").onclick=()=>{filterMode="fav";document.getElementById("foodMode").textContent="Favoriten";renderFoods()};
+document.getElementById("addCustom").onclick=openCustomFood;
+document.getElementById("saveCustomFood").onclick=saveCustomFood;
+document.getElementById("cancelCustomFood").onclick=closeCustomFood;
+document.getElementById("addProtein").onclick=addProtein;
+document.getElementById("openCustomSupp").onclick=openCustomSupp;
+document.getElementById("saveCustomSupp").onclick=saveCustomSupp;
+document.getElementById("cancelCustomSupp").onclick=closeCustomSupp;
+
+document.getElementById("newRecipe").onclick=()=>{recipeDraft=[];document.getElementById("recipeName").value="";document.getElementById("recipeBuilder").classList.add("open");populateRecipeFoods();renderRecipeDraft()};
+document.getElementById("cancelRecipe").onclick=()=>{recipeDraft=[];document.getElementById("recipeBuilder").classList.remove("open")};
+document.getElementById("addRecipeIngredient").onclick=()=>{let list=allFoods(),f=list[parseInt(document.getElementById("recipeFood").value,10)],g=parseFloat(document.getElementById("recipeGrams").value);if(!f||!g||g<=0)return;recipeDraft.push({...foodRef(f),grams:g});renderRecipeDraft()};
+document.getElementById("saveRecipe").onclick=()=>{let name=document.getElementById("recipeName").value.trim();if(!name)return toast("Bitte Rezeptname eingeben");if(!recipeDraft.length)return toast("Bitte Zutaten hinzufügen");state[profile].recipes.push({name,ingredients:recipeDraft.map(x=>structuredClone(x))});recipeDraft=[];save();document.getElementById("recipeBuilder").classList.remove("open");render();toast(name+" gespeichert")};
+document.getElementById("resetWeek").onclick=()=>{let wk=currentWeekDates();state[profile].log=state[profile].log.filter(e=>!wk.includes(e.date));state[profile].suppLog=state[profile].suppLog.filter(e=>!wk.includes(e.date));save();render();toast("Woche zurückgesetzt")};
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load",async()=>{
+    try{
+      const reg=await navigator.serviceWorker.register("./service-worker.js?v=12",{updateViaCache:"none"});
+      await reg.update();
+    }catch(e){}
+  });
+}
+render();
+</script>
+</body>
+</html>
